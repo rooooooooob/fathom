@@ -1,10 +1,9 @@
 #ifndef FATHOM_DIVER_HPP
 #define FATHOM_DIVER_HPP
 
-#include <SFML/Graphics/Sprite.hpp>
-
 #include "jam-engine/Core/Entity.hpp"
 #include "jam-engine/Core/Controller.hpp"
+#include "jam-engine/Graphics/Animation.hpp"
 
 namespace fathom
 {
@@ -29,10 +28,10 @@ private:
 	};
 
 	const int playerID;
-	sf::Sprite sprite;
 	int cooldown;
 	je::Controller controls;
 	je::AxesSet movement;
+	je::Animation swim;
 };
 
 } // fathom

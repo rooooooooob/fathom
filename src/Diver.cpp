@@ -2,6 +2,7 @@
 
 #include "jam-engine/Core/Game.hpp"
 #include "jam-engine/Core/Level.hpp"
+#include "jam-engine/Utility/Trig.hpp"
 
 namespace fathom
 {
@@ -37,29 +38,42 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 	,playerID(playerID)
 	,cooldown(-1)
 	,controls(level->getGame().getInput(), playerID)
+	,swim(level->getGame().getTexManager().get("diver_swim.png"), 32, 32, 10, true)
 {
-	sprite.setTexture(level->getGame().getTexManager().get("boat.png"));
 
 	assert(playerID < maxPlayers);
 
-	controls.setAxis("move_x_gp", je::Controller::AxisBind(sf::Joystick::Axis::PovX));
-	controls.setAxis("move_y_gp", je::Controller::AxisBind(sf::Joystick::Axis::PovX));
+	//controls.setAxis("move_x_gp", je::Controller::AxisBind(sf::Joystick::Axis::PovX));
+	//controls.setAxis("move_y_gp", je::Controller::AxisBind(sf::Joystick::Axis::PovX));
 	controls.setAxis("move_x_kb", je::Controller::AxisBind(je::Controller::Bind(leftKeys[playerID]), je::Controller::Bind(rightKeys[playerID])));
 	controls.setAxis("move_y_kb", je::Controller::AxisBind(je::Controller::Bind(upKeys[playerID]), je::Controller::Bind(downKeys[playerID])));
 	movement = je::AxesSet({
-		je::Axes(controls, "move_x_gp", "move_y_gp"),
+		//je::Axes(controls, "move_x_gp", "move_y_gp"),
 		je::Axes(controls, "move_x_kb", "move_y_kb")
 	});
+
+
+	swim.setOrigin(16.f, 16.f);
 }
 
 
 void Diver::draw(sf::RenderTarget& target, const sf::RenderStates &states) const
 {
-	target.draw(sprite, states);
+	target.draw(swim, states);
 }
 
 void Diver::onUpdate()
 {
+	const float SWIM_SPEED = 4.f;
+	const sf::Vector2f mPos(movement.getPos());
+	if (je::length(mPos) > 0.2)
+	{
+		swim.advanceFrame();
+		transform().move(mPos * SWIM_SPEED);
+		swim.setScale(mPos.x < 0.f ? -1.f : 1.f, 1.f);
+	}
+
+	swim.setPosition(getPos());
 }
 
 } // fathom
