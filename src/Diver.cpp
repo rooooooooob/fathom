@@ -69,9 +69,18 @@ void Diver::onUpdate()
 	if (je::length(mPos) > 0.2)
 	{
 		swim.advanceFrame();
-		transform().move(mPos * SWIM_SPEED);
+		veloc += mPos * 1.f;
 		swim.setScale(mPos.x < 0.f ? -1.f : 1.f, 1.f);
 	}
+
+	if (je::length(veloc) > SWIM_SPEED)
+	{
+		veloc = je::lengthdir(SWIM_SPEED, je::direction(veloc));
+	}
+
+	veloc = 0.9f * veloc;
+
+	transform().move(veloc);
 
 	swim.setPosition(getPos());
 }

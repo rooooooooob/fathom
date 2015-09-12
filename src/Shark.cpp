@@ -64,6 +64,8 @@ void Shark::onUpdate()
 	{
 		veloc = je::lengthdir(6.f, je::direction(veloc));
 	}
+	veloc *= 0.95f;
+	attackAnim.setScale(veloc.x < 0.f ? -1.f : 1.f, 1.f);
 	transform().move(veloc);
 	attackAnim.setPosition(getPos());
 }

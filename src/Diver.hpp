@@ -32,6 +32,7 @@ private:
 	je::Controller controls;
 	je::AxesSet movement;
 	je::Animation swim;
+	sf::Vector2f veloc;
 };
 
 } // fathom
