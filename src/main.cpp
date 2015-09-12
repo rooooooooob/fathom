@@ -4,6 +4,7 @@
 
 #include "Diver.hpp"
 #include "Shark.hpp"
+#include "Mine.hpp"
 
 int main()
 {
@@ -15,5 +16,7 @@ int main()
 	for (int i = 0; i < 1; ++i)
 		level->addEntity(new fathom::Diver(level, sf::Vector2f(je::randomf(width), je::randomf(height)), i));
 	level->addEntity(new fathom::Shark(level, sf::Vector2f(je::randomf(width), je::randomf(height))));
+	for (int i = 0; i < 32; ++i)
+		level->addEntity(new fathom::Mine(level, sf::Vector2f(je::randomf(width), je::randomf(height))));
 	return game.execute();
 }
