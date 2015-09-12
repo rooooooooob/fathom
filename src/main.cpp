@@ -1,13 +1,19 @@
 #include "jam-engine/Core/Game.hpp"
 #include "jam-engine/Core/Level.hpp"
+#include "jam-Engine/Utility/Random.hpp"
 
 #include "Diver.hpp"
+#include "Shark.hpp"
 
 int main()
 {
-	je::Game game(640, 480, 30);
-	je::Level *level = new je::Level(&game, 640, 480);
+	const int width = 640;
+	const int height = 480;
+	je::Game game(width, height, 30);
+	je::Level *level = new je::Level(&game, width, height);
 	game.setLevel(level);
-	level->addEntity(new fathom::Diver(level, sf::Vector2f(320, 240), 0));
+	for (int i = 0; i < 1; ++i)
+		level->addEntity(new fathom::Diver(level, sf::Vector2f(je::randomf(width), je::randomf(height)), i));
+	level->addEntity(new fathom::Shark(level, sf::Vector2f(je::randomf(width), je::randomf(height))));
 	return game.execute();
 }

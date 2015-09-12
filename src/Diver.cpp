@@ -34,7 +34,7 @@ sf::Keyboard::Key downKeys[maxPlayers] = {
 };
 
 Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
-	:je::Entity(level, "Diver", pos, sf::Vector2i(16, 32))
+	:je::Entity(level, "Diver", pos, sf::Vector2i(16, 32), sf::Vector2i(-8, -16))
 	,playerID(playerID)
 	,cooldown(-1)
 	,controls(level->getGame().getInput(), playerID)
