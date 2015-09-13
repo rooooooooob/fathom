@@ -28,6 +28,7 @@ private:
 
 	je::Camera *camera;
 	mutable sf::Sprite arrow;
+	int playerCount;
 };
 
 } // fathom

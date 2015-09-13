@@ -15,6 +15,7 @@ namespace fathom
 Ocean::Ocean(je::Game *game)
 	:je::Level(game, 900, 9999)
 	,arrow(game->getTexManager().get("arrow.png"))
+	,playerCount(3)
 {
 	const sf::Color top(60, 130, 170);
 	const sf::Color bottom = sf::Color::Black;
@@ -24,7 +25,7 @@ Ocean::Ocean(je::Game *game)
 	ocean[3] = sf::Vertex(sf::Vector2f(0.f, getHeight()), bottom);
 
 
-	camera = new je::Camera(this, 10, 0.5f, sf::Rect<int>(0, 0, 640, 480));
+	camera = new je::Camera(this, 16.f, 0.5f, sf::Rect<int>(0, 0, 640, 480));
 	camera->snap(sf::Vector2f(getWidth() / 2, 999));
 
 	arrow.setOrigin(16.f, 16.f);
@@ -36,6 +37,23 @@ Ocean::Ocean(je::Game *game)
 // private
 void Ocean::onUpdate()
 {
+	if (getGame().getInput().isKeyPressed(sf::Keyboard::Key::Num1))
+	{
+		playerCount = 1;
+	}
+	if (getGame().getInput().isKeyPressed(sf::Keyboard::Key::Num2))
+	{
+		playerCount = 2;
+	}
+	if (getGame().getInput().isKeyPressed(sf::Keyboard::Key::Num3))
+	{
+		playerCount = 3;
+	}
+	if (getGame().getInput().isKeyPressed(sf::Keyboard::Key::R))
+	{
+		reset();
+	}
+
 	if (entities.at("Diver").empty())
 		reset();
 
@@ -78,7 +96,7 @@ void Ocean::reset()
 
 	const int safeDepth = 480;
 
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < playerCount; ++i)
 		addEntity(new Diver(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(safeDepth)), i));
 
 	for (int i = 0; i < 16; ++i)
