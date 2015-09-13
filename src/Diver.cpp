@@ -60,7 +60,7 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 	,controls(level->getGame().getInput(), playerID)
 	,swim(level->getGame().getTexManager().get("diver_swim.png"), 32, 32, 10, true)
 	,shoot(level->getGame().getTexManager().get("diver_shoot.png"), 32, 32, 16, false)
-	,maxhp(200)
+	,maxhp(20)
 	,hp(maxhp)
 {
 
@@ -101,10 +101,10 @@ bool Diver::damage(int amount)
 {
 	for (int i = 0; i < amount; ++i)
 	{
-		level->addEntity(new Blood(level, getPos(), je::lengthdir(je::randomf(2.f), je::random(180))));
+		level->addEntity(new Blood(level, getPos(), je::lengthdir(je::randomf(0.8f), je::random(180))));
 	}
 
-	if (hp < amount)
+	if (hp <= amount)
 	{
 		destroy();
 		return true;

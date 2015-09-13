@@ -18,7 +18,7 @@ Shark::Shark(je::Level *level, const sf::Vector2f& pos)
 	:je::Entity(level, "Shark", pos, sf::Vector2i(48, 24), sf::Vector2i(-24, -12))
 	,attackAnim(level->getGame().getTexManager().get("shark_bite.png"), 48, 24, 4, true)
 	,target(nullptr)
-	,hp(30)
+	,hp(50)
 {
 	attackAnim.setOrigin(24, 12);
 
@@ -33,7 +33,7 @@ bool Shark::damage(int amount)
 		level->addEntity(new Blood(level, getPos(), je::lengthdir(je::randomf(0.8f), je::random(180))));
 	}
 
-	if (hp <= amount)
+	if (hp < amount)
 	{
 		destroy();
 		return true;

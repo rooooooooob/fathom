@@ -14,12 +14,16 @@ class Shark : public je::Entity
 public:
 	Shark(je::Level *level, const sf::Vector2f& pos);
 
-	void damage(int amount);
+	bool damage(int amount);
 
 private:
 	void draw(sf::RenderTarget& target, const sf::RenderStates &states) const override;
 
 	void onUpdate() override;
+
+	void patrolRandomDirection();
+
+	float getPatrolSpeed() const;
 
 	je::Animation attackAnim;
 	sf::Vector2f veloc;

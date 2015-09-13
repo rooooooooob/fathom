@@ -3,6 +3,9 @@
 #include "jam-engine/Core/Game.hpp"
 #include "jam-engine/Core/Level.hpp"
 
+#include "Diver.hpp"
+#include "Shark.hpp"
+
 namespace fathom
 {
 
@@ -23,6 +26,21 @@ void Harpoon::draw(sf::RenderTarget& target, const sf::RenderStates &states) con
 
 void Harpoon::onUpdate()
 {
+	je::Entity* toKill = level->testCollision(this, "Shark");
+	if (toKill)
+	{
+		((Shark*)toKill)->damage(30);
+		destroy();
+		return;
+	}
+	toKill = level->testCollision(this, "Diver");
+	if (toKill)
+	{
+		((Diver*)toKill)->damage(30);
+		destroy();
+		return;
+	}
+
 	veloc *= 0.9f;
 	veloc.y += 0.1f;
 	if (veloc.x < 2.f && veloc.x > -0.2f)

@@ -55,7 +55,7 @@ void Ocean::reset()
 
 	const int safeDepth = 480;
 
-	for (int i = 0; i < 1; ++i)
+	for (int i = 0; i < 2; ++i)
 		addEntity(new Diver(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(safeDepth)), i));
 
 	for (int i = 0; i < 16; ++i)

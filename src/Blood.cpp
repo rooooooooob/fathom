@@ -13,7 +13,7 @@ Blood::Blood(je::Level *level, const sf::Vector2f& pos, const sf::Vector2f& velo
 	,veloc(veloc)
 	,cooldown(je::randomf(64 + je::random(128)))
 {
-	sprite.setColor(sf::Color(255, 255, 255, 48 + je::random(72)));
+	sprite.setColor(sf::Color(255, 255, 255, 128 + je::random(127)));
 	sprite.setOrigin(4, 4);
 	sprite.setRotation(je::random(360));
 }
