@@ -47,10 +47,9 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 	//controls.setAxis("move_y_gp", je::Controller::AxisBind(sf::Joystick::Axis::PovX));
 	controls.setAxis("move_x_kb", je::Controller::AxisBind(je::Controller::Bind(leftKeys[playerID]), je::Controller::Bind(rightKeys[playerID])));
 	controls.setAxis("move_y_kb", je::Controller::AxisBind(je::Controller::Bind(upKeys[playerID]), je::Controller::Bind(downKeys[playerID])));
-	movement = je::AxesSet({
-		//je::Axes(controls, "move_x_gp", "move_y_gp"),
-		je::Axes(controls, "move_x_kb", "move_y_kb")
-	});
+	const je::Axes gpAxes(controls, "move_x_gp", "move_y_gp");
+	const je::Axes kbAxes(controls, "move_x_kb", "move_y_kb");
+	movement = je::AxesSet({kbAxes, gpAxes});
 
 
 	swim.setOrigin(16.f, 16.f);
