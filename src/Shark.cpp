@@ -117,14 +117,14 @@ void Shark::onUpdate()
 		{
 			if (veloc.x > 0.f)
 			{
-				if (getPos().x > level->getWidth() - 64 || level->testCollision(this, "Mine", 32))
+				if (getPos().x > level->getWidth() - 64 || level->testCollision(sf::Rect<int>(getPos().x, getPos().y - 27, 64, 56), "Mine"))
 				{
 					veloc.x = -getPatrolSpeed();
 				}
 			}
 			else
 			{
-				if (getPos().x < 64 || level->testCollision(this, "Mine", -32))
+				if (getPos().x < 64 || level->testCollision(sf::Rect<int>(getPos().x - 64, getPos().y - 27, 64, 56), "Mine"))
 				{
 					veloc.x = getPatrolSpeed();
 				}
