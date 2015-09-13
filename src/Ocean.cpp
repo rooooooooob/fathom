@@ -139,24 +139,25 @@ void Ocean::reset()
 
 	for (int i = 0; i < playerCount; ++i)
 	{
-		addEntity(new Diver(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(safeDepth)), i));
+		addEntity(new Diver(this, sf::Vector2f(je::randomf(getWidth() - 32) + 16, je::randomf(safeDepth)), i));
 	}
 
 	for (int i = 0; i < 24 * ratio; ++i)
 	{
-		addEntity(new Shark(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(getHeight() - safeDepth * 2) + safeDepth * 2)));
+		addEntity(new Shark(this, sf::Vector2f(je::randomf(getWidth() - 32) + 16, je::randomf(getHeight() - safeDepth * 2) + safeDepth * 2)));
 	}
 
 	// extra ones in bottom bit
 	for (int i = 0; i < 8 * ratio; ++i)
 	{
-		addEntity(new Shark(this, sf::Vector2f(je::randomf(getWidth()), getHeight() - 80 - je::randomf(480))));
+		addEntity(new Shark(this, sf::Vector2f(je::randomf(getWidth() - 32) + 16, getHeight() - 80 - je::randomf(480))));
 	}
 
 
+	std::vector<sf::Vector2f> placesToPutMines;
 	for (int i = 0; i < 32 * ratio; ++i)
 	{
-		const sf::Vector2f tPos(je::random(getWidth()), getHeight() - 72 - je::random(getHeight() / 2 - 72 + je::random(getHeight() / 2)));
+		const sf::Vector2f tPos(je::random(getWidth() - 32) + 16, getHeight() - 72 - je::random(getHeight() / 2 - 72 + je::random(getHeight() / 2)));
 		addEntity(new Treasure(this, tPos));
 		// spawn sharks around too :D
 		const int guardians = je::random(2);
@@ -164,6 +165,10 @@ void Ocean::reset()
 		{
 			addEntity(new Shark(this, tPos));
 		}
+		placesToPutMines.push_back(tPos);
+	}
+	for (const sf::Vector2f& tPos : placesToPutMines)
+	{
 		const int mines = je::random(8);
 		for (int j = 0; j < mines; ++j)
 		{

@@ -212,21 +212,21 @@ void Diver::onUpdate()
 	transform().move(veloc);
 
 
-	if (getPos().x > level->getWidth() - 64)
+	if (getPos().x > level->getWidth() - 16)
 	{
-		transform().setPosition(level->getWidth() - 64, getPos().y);
+		transform().setPosition(level->getWidth() - 16, getPos().y);
 	}
-	if (getPos().x < 64)
+	if (getPos().x < 16)
 	{
-		transform().setPosition(64, getPos().y);
+		transform().setPosition(16, getPos().y);
 	}
 	if (getPos().y > level->getHeight() - 64 - 8)
 	{
 		transform().setPosition(getPos().x, level->getHeight() - 64 - 8);
 	}
-	if (getPos().x < 64)
+	if (getPos().x < 16)
 	{
-		transform().setPosition(getPos().x, 64);
+		transform().setPosition(getPos().x, 16);
 	}
 
 	swim.setPosition(getPos());

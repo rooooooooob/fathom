@@ -31,6 +31,7 @@ private:
 	Diver *target;
 	int hp;
 	Ocean *ocean;
+	int hackyCooldown;
 };
 
 } // fathom

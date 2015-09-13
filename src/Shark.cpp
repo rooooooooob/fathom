@@ -21,10 +21,19 @@ Shark::Shark(Ocean *ocean, const sf::Vector2f& pos)
 	,target(nullptr)
 	,hp(30)
 	,ocean(ocean)
+	,hackyCooldown(128) // to stop sharks from dying immediately to mines
 {
 	attackAnim.setOrigin(24, 12);
 
 	veloc.x = je::choose({je::randomf(1.f), -je::randomf(1.f)});
+
+	// delete mines around shark so they don't immediately die... (couldn't fix in Ocean)
+	std::vector<je::Entity*> mines;
+	ocean->findCollisions(mines, sf::Rect<int>(getPos().x - 64, getPos().y - 48, 128, 96), "Mine");
+	for (je::Entity *mine : mines)
+	{
+		mine->destroy();
+	}
 }
 
 
@@ -53,7 +62,11 @@ void Shark::draw(sf::RenderTarget& target, const sf::RenderStates &states) const
 
 void Shark::onUpdate()
 {
-	if (level->testCollision(this, "Explosion"))
+	if (hackyCooldown > 0)
+	{
+		--hackyCooldown;
+	}
+	if (hackyCooldown == 0 && level->testCollision(this, "Explosion"))
 	{
 		damage(1);
 	}
@@ -120,21 +133,21 @@ void Shark::onUpdate()
 	}
 	attackAnim.setScale(veloc.x < 0.f ? -1.f : 1.f, 1.f);
 	transform().move(veloc);
-	if (getPos().x > level->getWidth() - 64)
+	if (getPos().x > level->getWidth() - 24)
 	{
-		transform().setPosition(level->getWidth() - 64, getPos().y);
+		transform().setPosition(level->getWidth() - 24, getPos().y);
 	}
-	if (getPos().x < 64)
+	if (getPos().x < 24)
 	{
-		transform().setPosition(64, getPos().y);
+		transform().setPosition(24, getPos().y);
 	}
 	if (getPos().y > level->getHeight() - 64 - 8)
 	{
 		transform().setPosition(getPos().x, level->getHeight() - 64 - 8);
 	}
-	if (getPos().x < 64)
+	if (getPos().x < 24)
 	{
-		transform().setPosition(getPos().x, 64);
+		transform().setPosition(getPos().x, 24);
 	}
 
 	attackAnim.setPosition(getPos());
