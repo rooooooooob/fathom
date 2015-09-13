@@ -159,7 +159,7 @@ void Diver::onUpdate()
 			if (controls.isActionPressed("fire"))
 			{
 				state = State::Firing;
-				cooldown = 64;
+				cooldown = 48;
 				shoot.setScale(swim.getScale());
 				break;
 			}
@@ -211,11 +211,29 @@ void Diver::onUpdate()
 
 	transform().move(veloc);
 
+
+	if (getPos().x > level->getWidth() - 64)
+	{
+		transform().setPosition(level->getWidth() - 64, getPos().y);
+	}
+	if (getPos().x < 64)
+	{
+		transform().setPosition(64, getPos().y);
+	}
+	if (getPos().y > level->getHeight() - 64 - 8)
+	{
+		transform().setPosition(getPos().x, level->getHeight() - 64 - 8);
+	}
+	if (getPos().x < 64)
+	{
+		transform().setPosition(getPos().x, 64);
+	}
+
 	swim.setPosition(getPos());
 	shoot.setPosition(getPos());
 	deadSprite.setPosition(getPos());
 
-	hpText.setPosition(getPos().x - hpText.getLocalBounds().width / 2, getPos().y + 48);
+	hpText.setPosition(getPos().x - hpText.getLocalBounds().width / 2, getPos().y + 24);
 	std::stringstream ss;
 	ss << hp << " / " << maxhp;
 	hpText.setString(ss.str());

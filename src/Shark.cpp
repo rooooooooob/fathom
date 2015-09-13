@@ -120,6 +120,23 @@ void Shark::onUpdate()
 	}
 	attackAnim.setScale(veloc.x < 0.f ? -1.f : 1.f, 1.f);
 	transform().move(veloc);
+	if (getPos().x > level->getWidth() - 64)
+	{
+		transform().setPosition(level->getWidth() - 64, getPos().y);
+	}
+	if (getPos().x < 64)
+	{
+		transform().setPosition(64, getPos().y);
+	}
+	if (getPos().y > level->getHeight() - 64 - 8)
+	{
+		transform().setPosition(getPos().x, level->getHeight() - 64 - 8);
+	}
+	if (getPos().x < 64)
+	{
+		transform().setPosition(getPos().x, 64);
+	}
+
 	attackAnim.setPosition(getPos());
 }
 

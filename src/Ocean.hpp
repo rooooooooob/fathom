@@ -9,7 +9,7 @@ namespace fathom
 class Ocean : public je::Level
 {
 public:
-	Ocean(je::Game *game);
+	Ocean(je::Game *game, int oceanDepth);
 
 
 
@@ -36,6 +36,7 @@ private:
 	int score;
 	sf::Font font;
 	sf::Text scoreText;
+	sf::Text scoreTextValues;
 };
 
 } // fathom

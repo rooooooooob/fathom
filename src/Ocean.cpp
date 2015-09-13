@@ -11,12 +11,14 @@
 #include "Shark.hpp"
 #include "Mine.hpp"
 #include "Treasure.hpp"
+#include "ShipWreck.hpp"
+#include "BottomOfOcean.hpp"
 
 namespace fathom
 {
 
-Ocean::Ocean(je::Game *game)
-	:je::Level(game, 900, 9999)
+Ocean::Ocean(je::Game *game, int oceanDepth)
+	:je::Level(game, 900, oceanDepth)
 	,arrow(game->getTexManager().get("arrow.png"))
 	,playerCount(1)
 	,highscore(0)
@@ -44,6 +46,12 @@ Ocean::Ocean(je::Game *game)
 	scoreText.setFont(font);
 	scoreText.setCharacterSize(16);
 	scoreText.setPosition(16, 16);
+	scoreText.setString("Score:\nHighscore:\nDepth:");
+
+	scoreTextValues.setColor(sf::Color(192, 255, 255));
+	scoreTextValues.setFont(font);
+	scoreTextValues.setCharacterSize(16);
+	scoreTextValues.setPosition(100, 16);
 }
 
 
@@ -86,8 +94,9 @@ void Ocean::onUpdate()
 	camera->update(avgPos + sf::Vector2f(0.f, 96.f));
 
 	std::stringstream ss;
-	ss << "Score: \t" << score << "\nHighscore: " << highscore;
-	scoreText.setString(ss.str());
+	const int fathoms = camera->getPosition().y / 32;
+	ss << score << "\n" << highscore << "\n" << fathoms << " fathoms";
+	scoreTextValues.setString(ss.str());
 }
 
 void Ocean::beforeDraw(sf::RenderTarget& target) const
@@ -116,6 +125,7 @@ void Ocean::drawGUI(sf::RenderTarget& target) const
 	}
 
 	target.draw(scoreText);
+	target.draw(scoreTextValues);
 }
 
 
@@ -125,17 +135,50 @@ void Ocean::reset()
 
 	const int safeDepth = 480;
 
+	const float ratio = getHeight() / 9999.f;
+
 	for (int i = 0; i < playerCount; ++i)
 	{
 		addEntity(new Diver(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(safeDepth)), i));
 	}
 
-	for (int i = 0; i < 16; ++i)
+	for (int i = 0; i < 24 * ratio; ++i)
 	{
 		addEntity(new Shark(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(getHeight() - safeDepth * 2) + safeDepth * 2)));
 	}
 
-	for (int i = 0; i < 320; ++i)
+	// extra ones in bottom bit
+	for (int i = 0; i < 8 * ratio; ++i)
+	{
+		addEntity(new Shark(this, sf::Vector2f(je::randomf(getWidth()), getHeight() - 80 - je::randomf(480))));
+	}
+
+
+	for (int i = 0; i < 32 * ratio; ++i)
+	{
+		const sf::Vector2f tPos(je::random(getWidth()), getHeight() - 72 - je::random(getHeight() / 2 - 72 + je::random(getHeight() / 2)));
+		addEntity(new Treasure(this, tPos));
+		// spawn sharks around too :D
+		const int guardians = je::random(2);
+		for (int i = 0; i < guardians; ++i)
+		{
+			addEntity(new Shark(this, tPos));
+		}
+		const int mines = je::random(8);
+		for (int j = 0; j < mines; ++j)
+		{
+			sf::Vector2f mPos;
+			do
+			{
+				const int angle = je::random(90) + je::choose({45, 225});
+				mPos = tPos + je::lengthdir(24 + je::random(16), angle);
+			}
+			while (testCollision(sf::Rect<int>(mPos.x - 64, mPos.y - 64, 128, 128), "Shark"));
+			addEntity(new Mine(this, mPos));
+		}
+	}
+
+	for (int i = 0; i < 320 * ratio; ++i)
 	{
 		int mx, my;
 		do
@@ -147,11 +190,12 @@ void Ocean::reset()
 		addEntity(new Mine(this, sf::Vector2f(mx, my)));
 	}
 
-	for (int i = 0; i < 32; ++i)
+	for (int x = 0; x <= getWidth(); x += 64)
 	{
-		const int ty = getHeight() - je::random(getHeight() / 2 + je::random(getHeight() / 2));
-		addEntity(new Treasure(this, sf::Vector2f(je::random(getWidth()), ty)));
+		addEntity(new BottomOfOcean(this, sf::Vector2f(x, getHeight() - 64)));
 	}
+
+	addEntity(new ShipWreck(this, sf::Vector2f(64 + je::random(getWidth() - 64 - 128), getHeight() - 64 - 128 + 8)));
 
 	camera->snap(sf::Vector2f(getWidth() / 2, 999));
 

@@ -2,8 +2,10 @@
 
 #include "jam-engine/Core/Level.hpp"
 #include "jam-engine/Core/Game.hpp"
+#include "jam-engine/Utility/Random.hpp"
 
 #include "Ocean.hpp"
+#include "Coin.hpp"
 
 namespace fathom
 {
@@ -33,6 +35,7 @@ void Treasure::onUpdate()
 			destroy();
 		}
 		animation.advanceFrame();
+		ocean->addEntity(new Coin(ocean, sf::Vector2f(getPos().x + 3 + je::random(6), getPos().y - 4)));
 	}
 	else if (level->testCollision(this, "Diver"))
 	{
