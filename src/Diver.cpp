@@ -88,6 +88,12 @@ void Diver::draw(sf::RenderTarget& target, const sf::RenderStates &states) const
 
 void Diver::onUpdate()
 {
+	if (level->testCollision(this, "Explosion"))
+	{
+		damage(1);
+	}
+
+
 	const float SWIM_SPEED = 4.f;
 	const sf::Vector2f mPos(movement.getPos());
 	if (je::length(mPos) > 0.2)

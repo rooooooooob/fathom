@@ -21,22 +21,19 @@ Ocean::Ocean(je::Game *game)
 	ocean[3] = sf::Vertex(sf::Vector2f(0.f, getHeight()), bottom);
 
 
-	for (int i = 0; i < 3; ++i)
-		addEntity(new Diver(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(480)), i));
-
-	for (int i = 0; i < 16; ++i)
-		addEntity(new Shark(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(getHeight()))));
-
-	for (int i = 0; i < 256; ++i)
-		addEntity(new Mine(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(getHeight()))));
-
 	camera = new je::Camera(this, 10, 0.5f, sf::Rect<int>(0, 0, 640, 480));
+	camera->snap(sf::Vector2f(getWidth() / 2, 999));
+
+	reset();
 }
 
 
 // private
 void Ocean::onUpdate()
 {
+	if (entities.at("Diver").empty())
+		reset();
+
 	sf::Vector2f avgPos;
 	for (const je::Entity *diver : entities.at("Diver"))
 	{
@@ -49,6 +46,23 @@ void Ocean::onUpdate()
 void Ocean::beforeDraw(sf::RenderTarget& target) const
 {
 	target.draw(ocean, 5, sf::PrimitiveType::Quads);
+}
+
+
+void Ocean::reset()
+{
+	clearEntities();
+
+	const int safeDepth = 480;
+
+	for (int i = 0; i < 1; ++i)
+		addEntity(new Diver(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(safeDepth)), i));
+
+	for (int i = 0; i < 16; ++i)
+		addEntity(new Shark(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(getHeight() - safeDepth * 2) + safeDepth * 2)));
+
+	for (int i = 0; i < 256; ++i)
+		addEntity(new Mine(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(getHeight() - safeDepth * 1.3f) + safeDepth * 1.3f)));
 }
 
 } // fathom

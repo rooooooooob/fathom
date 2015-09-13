@@ -25,6 +25,11 @@ void Shark::draw(sf::RenderTarget& target, const sf::RenderStates &states) const
 
 void Shark::onUpdate()
 {
+	if (level->testCollision(this, "Explosion"))
+	{
+		destroy();
+	}
+
 	if (target)
 	{
 		const int dist = je::pointDistance(getPos(), target->getPos());
@@ -33,7 +38,7 @@ void Shark::onUpdate()
 			attackAnim.advanceFrame();
 			if (dist < 16)
 			{
-				// hurt player
+				target->damage(1);
 			}
 		}
 		else if (dist < 1920)

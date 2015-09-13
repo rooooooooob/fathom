@@ -11,10 +11,18 @@ class Ocean : public je::Level
 public:
 	Ocean(je::Game *game);
 
+
+
 private:
+
 	void onUpdate() override;
 
 	void beforeDraw(sf::RenderTarget& target) const override;
+
+
+	void reset();
+
+
 
 	sf::Vertex ocean[5];
 

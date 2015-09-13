@@ -11,7 +11,7 @@ namespace fathom
 {
 
 const je::CircleMask explosionMasks[6] = {
-	5, 20, 36, 42, 45, 52
+	5 / 2, 20 / 2, 36 / 2, 42 / 2, 45 / 2, 52 / 2
 };
 
 Explosion::Explosion(je::Level *level, const sf::Vector2f& pos)
@@ -19,6 +19,7 @@ Explosion::Explosion(je::Level *level, const sf::Vector2f& pos)
 	,maskIndex(0)
 	,anim(level->getGame().getTexManager().get("explosion.png"), 128, 128, 4, false)
 {
+	transform().setPosition(pos); // to make masks be in right pos
 	anim.setOrigin(64, 64);
 }
 
