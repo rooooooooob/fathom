@@ -11,7 +11,7 @@ namespace fathom
 {
 
 Ocean::Ocean(je::Game *game)
-	:je::Level(game, 640, 9999)
+	:je::Level(game, 900, 9999)
 {
 	const sf::Color top(60, 130, 170);
 	const sf::Color bottom = sf::Color::Black;
@@ -55,13 +55,13 @@ void Ocean::reset()
 
 	const int safeDepth = 480;
 
-	for (int i = 0; i < 1; ++i)
+	for (int i = 0; i < 3; ++i)
 		addEntity(new Diver(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(safeDepth)), i));
 
 	for (int i = 0; i < 16; ++i)
 		addEntity(new Shark(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(getHeight() - safeDepth * 2) + safeDepth * 2)));
 
-	for (int i = 0; i < 256; ++i)
+	for (int i = 0; i < 192; ++i)
 		addEntity(new Mine(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(getHeight() - safeDepth * 1.3f) + safeDepth * 1.3f)));
 }
 

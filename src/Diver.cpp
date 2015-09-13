@@ -3,8 +3,11 @@
 #include <sstream>
 
 #include "jam-engine/Core/Game.hpp"
+#include "jam-engine/Core/GamepadPredefs.hpp"
 #include "jam-engine/Core/Level.hpp"
 #include "jam-engine/Utility/Trig.hpp"
+
+#include "Harpoon.hpp"
 
 namespace fathom
 {
@@ -35,6 +38,12 @@ sf::Keyboard::Key downKeys[maxPlayers] = {
 	sf::Keyboard::K
 };
 
+sf::Keyboard::Key fireKeys[maxPlayers] = {
+	sf::Keyboard::RControl,
+	sf::Keyboard::X,
+	sf::Keyboard::N
+};
+
 Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 	:je::Entity(level, "Diver", pos, sf::Vector2i(16, 32), sf::Vector2i(-8, -16))
 	,playerID(playerID)
@@ -47,13 +56,22 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 
 	assert(playerID < maxPlayers);
 
-	//controls.setAxis("move_x_gp", je::Controller::AxisBind(sf::Joystick::Axis::PovX));
-	//controls.setAxis("move_y_gp", je::Controller::AxisBind(sf::Joystick::Axis::PovX));
+	controls.setAxis("move_x_gp", je::Controller::AxisBind(sf::Joystick::Axis::X));
+	controls.setAxis("move_y_gp", je::Controller::AxisBind(sf::Joystick::Axis::Y));
 	controls.setAxis("move_x_kb", je::Controller::AxisBind(je::Controller::Bind(leftKeys[playerID]), je::Controller::Bind(rightKeys[playerID])));
 	controls.setAxis("move_y_kb", je::Controller::AxisBind(je::Controller::Bind(upKeys[playerID]), je::Controller::Bind(downKeys[playerID])));
 	const je::Axes gpAxes(controls, "move_x_gp", "move_y_gp");
 	const je::Axes kbAxes(controls, "move_x_kb", "move_y_kb");
 	movement = je::AxesSet({kbAxes, gpAxes});
+
+	controls.setKeybinds("fire", {
+		je::Controller::Bind(fireKeys[playerID]),
+		je::Binds::X360::X,
+		je::Binds::X360::RT
+	});
+
+	//controls.addKeybind("fire", je::Controller::Bind(fireKeys[playerID]));
+
 
 
 	swim.setOrigin(16.f, 16.f);
@@ -92,6 +110,12 @@ void Diver::onUpdate()
 	{
 		damage(1);
 	}
+
+	if (controls.isActionPressed("fire"))
+	{
+		level->addEntity(new Harpoon(level, getPos(), sf::Vector2f(swim.getScale().x * 32, 0.f)));
+	}
+
 
 
 	const float SWIM_SPEED = 4.f;
