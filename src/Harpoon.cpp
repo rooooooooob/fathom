@@ -13,6 +13,7 @@ Harpoon::Harpoon(je::Level *level, const sf::Vector2f& pos, const sf::Vector2f& 
 	sprite.setTexture(level->getGame().getTexManager().get("harpoon.png"));
 	sprite.setOrigin(5, 1);
 	sprite.setPosition(pos);
+	sprite.setScale(veloc.x > 0.f ? 1.f : -1.f, 1.f);
 }
 
 void Harpoon::draw(sf::RenderTarget& target, const sf::RenderStates &states) const

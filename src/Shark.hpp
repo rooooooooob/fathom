@@ -14,6 +14,8 @@ class Shark : public je::Entity
 public:
 	Shark(je::Level *level, const sf::Vector2f& pos);
 
+	void damage(int amount);
+
 private:
 	void draw(sf::RenderTarget& target, const sf::RenderStates &states) const override;
 
@@ -22,6 +24,7 @@ private:
 	je::Animation attackAnim;
 	sf::Vector2f veloc;
 	Diver *target;
+	int hp;
 };
 
 } // fathom

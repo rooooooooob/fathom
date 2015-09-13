@@ -44,12 +44,20 @@ sf::Keyboard::Key fireKeys[maxPlayers] = {
 	sf::Keyboard::N
 };
 
+const sf::Color playerColours[maxPlayers] = {
+	sf::Color(255, 16, 16),
+	sf::Color(16, 255, 16),
+	sf::Color(255, 255, 16)
+};
+
 Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 	:je::Entity(level, "Diver", pos, sf::Vector2i(16, 32), sf::Vector2i(-8, -16))
+	,state(State::Swimming)
 	,playerID(playerID)
 	,cooldown(-1)
 	,controls(level->getGame().getInput(), playerID)
 	,swim(level->getGame().getTexManager().get("diver_swim.png"), 32, 32, 10, true)
+	,shoot(level->getGame().getTexManager().get("diver_shoot.png"), 32, 32, 16, false)
 	,maxhp(20)
 	,hp(maxhp)
 {
@@ -75,11 +83,12 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 
 
 	swim.setOrigin(16.f, 16.f);
+	shoot.setOrigin(16.f, 16.f);
 
 	// really bad but not much time to do anything better (maybe put something into jam-engine for next time?)
 	hpFont.loadFromFile("arial.ttf");
 
-	hpText.setColor(sf::Color::Red);
+	hpText.setColor(playerColours[playerID]);
 	hpText.setFont(hpFont);
 	hpText.setCharacterSize(12);
 }
@@ -100,7 +109,15 @@ void Diver::damage(int amount)
 // private
 void Diver::draw(sf::RenderTarget& target, const sf::RenderStates &states) const
 {
-	target.draw(swim, states);
+	switch (state)
+	{
+	case State::Swimming:
+		target.draw(swim, states);
+		break;
+	case State::Firing:
+		target.draw(shoot, states);
+		break;
+	}
 	target.draw(hpText, states);
 }
 
@@ -111,32 +128,57 @@ void Diver::onUpdate()
 		damage(1);
 	}
 
-	if (controls.isActionPressed("fire"))
+
+	switch (state)
 	{
-		level->addEntity(new Harpoon(level, getPos(), sf::Vector2f(swim.getScale().x * 32, 0.f)));
+	case State::Swimming:
+		{
+			if (controls.isActionPressed("fire"))
+			{
+				state = State::Firing;
+				cooldown = 64;
+				shoot.setScale(swim.getScale());
+				break;
+			}
+			const sf::Vector2f mPos(movement.getPos());
+			if (je::length(mPos) > 0.2)
+			{
+				swim.advanceFrame();
+				veloc += mPos * 1.f;
+				swim.setScale(mPos.x < 0.f ? -1.f : 1.f, 1.f);
+			}
+
+			const float SWIM_SPEED = 4.f;
+			if (je::length(veloc) > SWIM_SPEED)
+			{
+				veloc = je::lengthdir(SWIM_SPEED, je::direction(veloc));
+			}
+			veloc = 0.9f * veloc;
+		}
+		break;
+	case State::Firing:
+		{
+			if (shoot.advanceFrame())
+			{
+				level->addEntity(new Harpoon(level, getPos() + sf::Vector2f(shoot.getScale().x * 16, 0.f), sf::Vector2f(shoot.getScale().x * 32, 0.f)));
+				veloc.x = shoot.getScale().x * -12.f;
+			}
+			if (--cooldown == 0)
+			{
+				state = State::Swimming;
+				shoot.reset();
+				break;
+			}
+			veloc = 0.93f * veloc;
+		}
+		break;
 	}
 
-
-
-	const float SWIM_SPEED = 4.f;
-	const sf::Vector2f mPos(movement.getPos());
-	if (je::length(mPos) > 0.2)
-	{
-		swim.advanceFrame();
-		veloc += mPos * 1.f;
-		swim.setScale(mPos.x < 0.f ? -1.f : 1.f, 1.f);
-	}
-
-	if (je::length(veloc) > SWIM_SPEED)
-	{
-		veloc = je::lengthdir(SWIM_SPEED, je::direction(veloc));
-	}
-
-	veloc = 0.9f * veloc;
 
 	transform().move(veloc);
 
 	swim.setPosition(getPos());
+	shoot.setPosition(getPos());
 
 	hpText.setPosition(getPos().x - hpText.getLocalBounds().width / 2, getPos().y + 48);
 	std::stringstream ss;

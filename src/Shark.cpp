@@ -3,6 +3,7 @@
 #include "jam-engine/Core/Game.hpp"
 #include "jam-engine/Core/Level.hpp"
 #include "jam-engine/Utility/Trig.hpp"
+#include "jam-engine/Utility/Random.hpp"
 
 #include "Diver.hpp"
 
@@ -13,6 +14,7 @@ Shark::Shark(je::Level *level, const sf::Vector2f& pos)
 	:je::Entity(level, "Shark", pos, sf::Vector2i(48, 24), sf::Vector2i(-24, -12))
 	,attackAnim(level->getGame().getTexManager().get("shark_bite.png"), 48, 24, 4, true)
 	,target(nullptr)
+	,hp(50)
 {
 	attackAnim.setOrigin(24, 12);
 }
@@ -54,13 +56,36 @@ void Shark::onUpdate()
 	else
 	{
 		std::vector<Entity*> closeDivers;
-		const sf::Rect<int> region(getPos().x - 192, getPos().y - 128, 192*2, 128*2);
+		const sf::Rect<int> region(getPos().x - 192 + attackAnim.getScale().x * 64, getPos().y - 128, 192*2, 128*2);
 		level->findCollisions(closeDivers, region, "Diver");
 		for (Entity *diver : closeDivers)
 		{
 			if (!target || je::pointDistance(getPos(), diver->getPos()) < je::pointDistance(getPos(), target->getPos()))
 			{
 				target = static_cast<Diver*>(diver);
+			}
+		}
+
+		if (!target)
+		{
+			if (je::length(veloc) < 0.4f)
+			{
+				veloc.x = je::randomf(2.f) - 1.f;
+			}
+
+			if (veloc.x > 0.f)
+			{
+				if (getPos().x > level->getWidth() - 64 || level->testCollision(this, "Mine", 32))
+				{
+					veloc.x = -0.5f - je::randomf(1.f);
+				}
+			}
+			else
+			{
+				if (getPos().x < 64 || level->testCollision(this, "Mine", -32))
+				{
+					veloc.x = 0.5f + je::randomf(1.f);
+				}
 			}
 		}
 	}

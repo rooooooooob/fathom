@@ -28,11 +28,13 @@ private:
 		Firing
 	};
 
+	State state;
 	const int playerID;
 	int cooldown;
 	je::Controller controls;
 	je::AxesSet movement;
 	je::Animation swim;
+	je::Animation shoot;
 	sf::Vector2f veloc;
 	int maxhp;
 	int hp;
