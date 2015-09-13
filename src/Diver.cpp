@@ -6,7 +6,9 @@
 #include "jam-engine/Core/GamepadPredefs.hpp"
 #include "jam-engine/Core/Level.hpp"
 #include "jam-engine/Utility/Trig.hpp"
+#include "jam-engine/Utility/Random.hpp"
 
+#include "Blood.hpp"
 #include "Harpoon.hpp"
 
 namespace fathom
@@ -58,7 +60,7 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 	,controls(level->getGame().getInput(), playerID)
 	,swim(level->getGame().getTexManager().get("diver_swim.png"), 32, 32, 10, true)
 	,shoot(level->getGame().getTexManager().get("diver_shoot.png"), 32, 32, 16, false)
-	,maxhp(20)
+	,maxhp(200)
 	,hp(maxhp)
 {
 
@@ -95,13 +97,20 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 
 
 
-void Diver::damage(int amount)
+bool Diver::damage(int amount)
 {
+	for (int i = 0; i < amount; ++i)
+	{
+		level->addEntity(new Blood(level, getPos(), je::lengthdir(je::randomf(2.f), je::random(180))));
+	}
+
 	if (hp < amount)
 	{
 		destroy();
+		return true;
 	}
 	hp -= amount;
+	return false;
 }
 
 

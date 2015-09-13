@@ -14,7 +14,11 @@ public:
 	Diver(je::Level *level, const sf::Vector2f& pos, int playerID);
 
 
-	void damage(int amount);
+	/**
+	 * @param amount amount to hurt
+	 * @return True if the Diver dies, False if he's still alive
+	 */
+	bool damage(int amount);
 
 private:
 	void draw(sf::RenderTarget& target, const sf::RenderStates &states) const override;

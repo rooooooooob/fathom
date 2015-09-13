@@ -17,6 +17,8 @@ Shark::Shark(je::Level *level, const sf::Vector2f& pos)
 	,hp(50)
 {
 	attackAnim.setOrigin(24, 12);
+
+	veloc.x = je::randomf(2.f) - 1.f;
 }
 
 
@@ -40,7 +42,11 @@ void Shark::onUpdate()
 			attackAnim.advanceFrame();
 			if (dist < 16)
 			{
-				target->damage(1);
+				if (target->damage(1))
+				{
+					target = nullptr;
+					veloc.x = je::randomf(2.f) - 1.f;
+				}
 			}
 		}
 		else if (dist < 1920)
@@ -50,7 +56,7 @@ void Shark::onUpdate()
 		else
 		{
 			target = nullptr;
-			veloc = sf::Vector2f(0.f, 0.f);
+			veloc.x = je::randomf(2.f) - 1.f;
 		}
 	}
 	else
@@ -68,11 +74,6 @@ void Shark::onUpdate()
 
 		if (!target)
 		{
-			if (je::length(veloc) < 0.4f)
-			{
-				veloc.x = je::randomf(2.f) - 1.f;
-			}
-
 			if (veloc.x > 0.f)
 			{
 				if (getPos().x > level->getWidth() - 64 || level->testCollision(this, "Mine", 32))
