@@ -49,7 +49,7 @@ void Shark::onUpdate()
 	else
 	{
 		std::vector<Entity*> closeDivers;
-		const sf::Rect<int> region(getPos().x - 192, getPos().x - 128, 192*2, 128*2);
+		const sf::Rect<int> region(getPos().x - 192, getPos().y - 128, 192*2, 128*2);
 		level->findCollisions(closeDivers, region, "Diver");
 		for (Entity *diver : closeDivers)
 		{

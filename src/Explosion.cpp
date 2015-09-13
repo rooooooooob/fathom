@@ -2,6 +2,7 @@
 
 #include "jam-engine/Core/Game.hpp"
 #include "jam-engine/Core/Level.hpp"
+#include "jam-engine/Physics/CircleMask.hpp"
 #include "jam-engine/Utility/Random.hpp"
 
 #include "Mine.hpp"
@@ -9,8 +10,13 @@
 namespace fathom
 {
 
+const je::CircleMask explosionMasks[6] = {
+	5, 20, 36, 42, 45, 52
+};
+
 Explosion::Explosion(je::Level *level, const sf::Vector2f& pos)
-	:je::Entity(level, "Explosion", pos, sf::Vector2i(128, 128), sf::Vector2i(-64, -64))
+	:je::Entity(level, "Explosion", pos, explosionMasks[0].clone())
+	,maskIndex(0)
 	,anim(level->getGame().getTexManager().get("explosion.png"), 128, 128, 4, false)
 {
 	anim.setOrigin(64, 64);
@@ -36,7 +42,10 @@ void Explosion::onUpdate()
 	{
 		destroy();
 	}
-	anim.advanceFrame();
+	if (anim.advanceFrame())
+	{
+		setMask(explosionMasks[++maskIndex].clone());
+	}
 	transform().setPosition(getPos());
 	anim.setPosition(getPos());
 }

@@ -18,6 +18,7 @@ private:
 	void onUpdate() override;
 
 
+	int maskIndex;
 	je::Animation anim;
 };
 
