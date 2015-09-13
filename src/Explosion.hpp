@@ -1,5 +1,5 @@
-#ifndef FATHOM_MINE_HPP
-#define FATHOM_MINE_HPP
+#ifndef FATHOM_EXPLOSION_HPP
+#define FATHOM_EXPLOSION_HPP
 
 #include "jam-engine/Core/Entity.hpp"
 #include "jam-engine/Graphics/Animation.hpp"
@@ -7,12 +7,10 @@
 namespace fathom
 {
 
-class Mine : public je::Entity
+class Explosion : public je::Entity
 {
 public:
-	Mine(je::Level *level, const sf::Vector2f& pos);
-
-	void explode();
+	Explosion(je::Level *level, const sf::Vector2f& pos);
 
 private:
 	void draw(sf::RenderTarget& target, const sf::RenderStates &states) const override;
@@ -20,11 +18,9 @@ private:
 	void onUpdate() override;
 
 
-	int wiggle;
-	float startY;
 	je::Animation anim;
 };
 
 } // fathom
 
-#endif // FATHOM_MINE_HPP
+#endif // FATHOM_EXPLOSION_HPP

@@ -6,6 +6,8 @@
 #include "jam-engine/Core/Level.hpp"
 #include "jam-engine/Utility/Random.hpp"
 
+#include "Explosion.hpp"
+
 namespace fathom
 {
 
@@ -21,6 +23,17 @@ Mine::Mine(je::Level *level, const sf::Vector2f& pos)
 }
 
 
+void Mine::explode()
+{
+	if (!isDead())
+	{
+		level->addEntity(new Explosion(level, getPos()));
+		destroy();
+	}
+}
+
+
+// priate
 void Mine::draw(sf::RenderTarget& target, const sf::RenderStates &states) const
 {
 	target.draw(anim, states);
@@ -28,6 +41,15 @@ void Mine::draw(sf::RenderTarget& target, const sf::RenderStates &states) const
 
 void Mine::onUpdate()
 {
+	static const char *triggers[] = {"Shark", "Diver"};
+	for (const char *trigger : triggers)
+	{
+		if (level->testCollision(this, trigger))
+		{
+			explode();
+		}
+	}
+
 	anim.advanceFrame();
 	transform().setPosition(getPos().x, startY + 16 * sin(++wiggle / period));
 	anim.setPosition(getPos());

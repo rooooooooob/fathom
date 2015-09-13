@@ -14,6 +14,7 @@ public:
 	Diver(je::Level *level, const sf::Vector2f& pos, int playerID);
 
 
+	void damage(int amount);
 
 private:
 	void draw(sf::RenderTarget& target, const sf::RenderStates &states) const override;
@@ -33,6 +34,10 @@ private:
 	je::AxesSet movement;
 	je::Animation swim;
 	sf::Vector2f veloc;
+	int maxhp;
+	int hp;
+	sf::Text hpText;
+	sf::Font hpFont;
 };
 
 } // fathom

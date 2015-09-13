@@ -1,5 +1,7 @@
 #include "Diver.hpp"
 
+#include <sstream>
+
 #include "jam-engine/Core/Game.hpp"
 #include "jam-engine/Core/Level.hpp"
 #include "jam-engine/Utility/Trig.hpp"
@@ -39,6 +41,8 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 	,cooldown(-1)
 	,controls(level->getGame().getInput(), playerID)
 	,swim(level->getGame().getTexManager().get("diver_swim.png"), 32, 32, 10, true)
+	,maxhp(20)
+	,hp(maxhp)
 {
 
 	assert(playerID < maxPlayers);
@@ -53,12 +57,33 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 
 
 	swim.setOrigin(16.f, 16.f);
+
+	// really bad but not much time to do anything better (maybe put something into jam-engine for next time?)
+	hpFont.loadFromFile("arial.ttf");
+
+	hpText.setColor(sf::Color::Red);
+	hpText.setFont(hpFont);
+	hpText.setCharacterSize(12);
 }
 
 
+
+void Diver::damage(int amount)
+{
+	if (hp < amount)
+	{
+		destroy();
+	}
+	hp -= amount;
+}
+
+
+
+// private
 void Diver::draw(sf::RenderTarget& target, const sf::RenderStates &states) const
 {
 	target.draw(swim, states);
+	target.draw(hpText, states);
 }
 
 void Diver::onUpdate()
@@ -82,6 +107,11 @@ void Diver::onUpdate()
 	transform().move(veloc);
 
 	swim.setPosition(getPos());
+
+	hpText.setPosition(getPos().x - hpText.getLocalBounds().width / 2, getPos().y + 48);
+	std::stringstream ss;
+	ss << hp << " / " << maxhp;
+	hpText.setString(ss.str());
 }
 
 } // fathom
