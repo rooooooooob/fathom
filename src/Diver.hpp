@@ -20,6 +20,8 @@ public:
 	 */
 	bool damage(int amount);
 
+	const sf::Color& getColor() const;
+
 private:
 	void draw(sf::RenderTarget& target, const sf::RenderStates &states) const override;
 
@@ -29,7 +31,8 @@ private:
 	enum class State
 	{
 		Swimming,
-		Firing
+		Firing,
+		Dead
 	};
 
 	State state;
@@ -39,6 +42,7 @@ private:
 	je::AxesSet movement;
 	je::Animation swim;
 	je::Animation shoot;
+	sf::Sprite deadSprite;
 	sf::Vector2f veloc;
 	int maxhp;
 	int hp;

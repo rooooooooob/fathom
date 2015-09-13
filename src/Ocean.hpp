@@ -27,6 +27,7 @@ private:
 	sf::Vertex ocean[5];
 
 	je::Camera *camera;
+	mutable sf::Sprite arrow;
 };
 
 } // fathom

@@ -4,6 +4,7 @@
 #include "jam-engine/Core/Level.hpp"
 
 #include "Diver.hpp"
+#include "Mine.hpp"
 #include "Shark.hpp"
 
 namespace fathom
@@ -37,6 +38,13 @@ void Harpoon::onUpdate()
 	if (toKill)
 	{
 		((Diver*)toKill)->damage(30);
+		destroy();
+		return;
+	}
+	toKill = level->testCollision(this, "Mine");
+	if (toKill)
+	{
+		((Mine*)toKill)->explode();
 		destroy();
 		return;
 	}

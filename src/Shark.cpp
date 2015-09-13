@@ -52,7 +52,7 @@ void Shark::onUpdate()
 {
 	if (level->testCollision(this, "Explosion"))
 	{
-		destroy();
+		damage(1);
 	}
 
 	if (target)

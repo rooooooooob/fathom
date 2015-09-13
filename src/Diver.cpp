@@ -1,5 +1,6 @@
 #include "Diver.hpp"
 
+#include <algorithm>
 #include <sstream>
 
 #include "jam-engine/Core/Game.hpp"
@@ -47,9 +48,9 @@ sf::Keyboard::Key fireKeys[maxPlayers] = {
 };
 
 const sf::Color playerColours[maxPlayers] = {
-	sf::Color(255, 16, 16),
+	sf::Color(192, 16, 16),
 	sf::Color(16, 255, 16),
-	sf::Color(255, 255, 16)
+	sf::Color(192, 16, 255)
 };
 
 Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
@@ -60,6 +61,7 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 	,controls(level->getGame().getInput(), playerID)
 	,swim(level->getGame().getTexManager().get("diver_swim.png"), 32, 32, 10, true)
 	,shoot(level->getGame().getTexManager().get("diver_shoot.png"), 32, 32, 16, false)
+	,deadSprite(level->getGame().getTexManager().get("diver_dead.png"))
 	,maxhp(20)
 	,hp(maxhp)
 {
@@ -86,11 +88,14 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 
 	swim.setOrigin(16.f, 16.f);
 	shoot.setOrigin(16.f, 16.f);
+	deadSprite.setOrigin(16.f, 16.f);
+
+	deadSprite.setScale(je::choose({1.f, -1.f}), 1.f);
 
 	// really bad but not much time to do anything better (maybe put something into jam-engine for next time?)
 	hpFont.loadFromFile("arial.ttf");
 
-	hpText.setColor(playerColours[playerID]);
+	hpText.setColor(getColor());
 	hpText.setFont(hpFont);
 	hpText.setCharacterSize(12);
 }
@@ -99,18 +104,24 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 
 bool Diver::damage(int amount)
 {
+	hp = std::max(0, hp - amount);
 	for (int i = 0; i < amount; ++i)
 	{
 		level->addEntity(new Blood(level, getPos(), je::lengthdir(je::randomf(0.8f), je::random(180))));
 	}
 
-	if (hp <= amount)
+	if (hp == 0)
 	{
-		destroy();
+		state = State::Dead;
+		cooldown = 96;
 		return true;
 	}
-	hp -= amount;
 	return false;
+}
+
+const sf::Color& Diver::getColor() const
+{
+	return playerColours[playerID];
 }
 
 
@@ -125,6 +136,9 @@ void Diver::draw(sf::RenderTarget& target, const sf::RenderStates &states) const
 		break;
 	case State::Firing:
 		target.draw(shoot, states);
+		break;
+	case State::Dead:
+		target.draw(deadSprite, states);
 		break;
 	}
 	target.draw(hpText, states);
@@ -181,6 +195,17 @@ void Diver::onUpdate()
 			veloc = 0.93f * veloc;
 		}
 		break;
+	case State::Dead:
+		{
+			veloc.x = 0.f;
+			veloc.y = -1.f - je::randomf(0.65f);
+			if (--cooldown == 0)
+			{
+				destroy();
+			}
+			level->addEntity(new Blood(level, getPos(), sf::Vector2f(-0.25f + je::randomf(0.5f), 0.f)));
+		}
+		break;
 	}
 
 
@@ -188,6 +213,7 @@ void Diver::onUpdate()
 
 	swim.setPosition(getPos());
 	shoot.setPosition(getPos());
+	deadSprite.setPosition(getPos());
 
 	hpText.setPosition(getPos().x - hpText.getLocalBounds().width / 2, getPos().y + 48);
 	std::stringstream ss;

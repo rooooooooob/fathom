@@ -1,7 +1,9 @@
 #include "Ocean.hpp"
 
 #include "jam-engine/Core/Camera.hpp"
+#include "jam-engine/Core/Game.hpp"
 #include "jam-Engine/Utility/Random.hpp"
+#include "jam-engine/Utility/Trig.hpp"
 
 #include "Diver.hpp"
 #include "Shark.hpp"
@@ -12,6 +14,7 @@ namespace fathom
 
 Ocean::Ocean(je::Game *game)
 	:je::Level(game, 900, 9999)
+	,arrow(game->getTexManager().get("arrow.png"))
 {
 	const sf::Color top(60, 130, 170);
 	const sf::Color bottom = sf::Color::Black;
@@ -23,6 +26,8 @@ Ocean::Ocean(je::Game *game)
 
 	camera = new je::Camera(this, 10, 0.5f, sf::Rect<int>(0, 0, 640, 480));
 	camera->snap(sf::Vector2f(getWidth() / 2, 999));
+
+	arrow.setOrigin(16.f, 16.f);
 
 	reset();
 }
@@ -46,6 +51,24 @@ void Ocean::onUpdate()
 void Ocean::beforeDraw(sf::RenderTarget& target) const
 {
 	target.draw(ocean, 5, sf::PrimitiveType::Quads);
+
+	for (const je::Entity *entity : entities.at("Diver"))
+	{
+		const Diver& diver = *((Diver*)entity);
+		if (!camera->getScreenRect().contains(diver.getPos()))
+		{
+			sf::Color col(diver.getColor());
+			col.a = 128;
+			arrow.setColor(col);
+			const float angle = je::pointDirection(camera->getPosition(), diver.getPos());
+			sf::Vector2f offset = je::lengthdir(1.f, angle);
+			offset.x *= 300;
+			offset.y *= 220;
+			arrow.setPosition(camera->getPosition() + offset);
+			arrow.setRotation(-angle);
+			target.draw(arrow);
+		}
+	}
 }
 
 
@@ -55,7 +78,7 @@ void Ocean::reset()
 
 	const int safeDepth = 480;
 
-	for (int i = 0; i < 2; ++i)
+	for (int i = 0; i < 3; ++i)
 		addEntity(new Diver(this, sf::Vector2f(je::randomf(getWidth()), je::randomf(safeDepth)), i));
 
 	for (int i = 0; i < 16; ++i)
