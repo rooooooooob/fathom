@@ -13,12 +13,15 @@ public:
 
 
 
+	void addScore(int amount);
+
 private:
 
 	void onUpdate() override;
 
 	void beforeDraw(sf::RenderTarget& target) const override;
 
+	void drawGUI(sf::RenderTarget& target) const override;
 
 	void reset();
 
@@ -29,6 +32,10 @@ private:
 	je::Camera *camera;
 	mutable sf::Sprite arrow;
 	int playerCount;
+	int highscore;
+	int score;
+	sf::Font font;
+	sf::Text scoreText;
 };
 
 } // fathom

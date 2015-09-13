@@ -7,6 +7,7 @@
 
 #include "Diver.hpp"
 #include "Blood.hpp"
+#include "Ocean.hpp"
 
 namespace fathom
 {
@@ -14,11 +15,12 @@ namespace fathom
 const int minPatrolSpeed = 1.f;
 const float maxPatrolSpeed = 2.f;
 
-Shark::Shark(je::Level *level, const sf::Vector2f& pos)
-	:je::Entity(level, "Shark", pos, sf::Vector2i(48, 24), sf::Vector2i(-24, -12))
-	,attackAnim(level->getGame().getTexManager().get("shark_bite.png"), 48, 24, 4, true)
+Shark::Shark(Ocean *ocean, const sf::Vector2f& pos)
+	:je::Entity(ocean, "Shark", pos, sf::Vector2i(48, 24), sf::Vector2i(-24, -12))
+	,attackAnim(ocean->getGame().getTexManager().get("shark_bite.png"), 48, 24, 4, true)
 	,target(nullptr)
 	,hp(30)
+	,ocean(ocean)
 {
 	attackAnim.setOrigin(24, 12);
 
@@ -36,6 +38,7 @@ bool Shark::damage(int amount)
 	if (hp <= amount)
 	{
 		destroy();
+		ocean->addScore(100);
 		return true;
 	}
 	hp -= amount;

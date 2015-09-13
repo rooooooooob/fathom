@@ -8,11 +8,12 @@ namespace fathom
 {
 
 class Diver;
+class Ocean;
 
 class Shark : public je::Entity
 {
 public:
-	Shark(je::Level *level, const sf::Vector2f& pos);
+	Shark(Ocean *ocean, const sf::Vector2f& pos);
 
 	bool damage(int amount);
 
@@ -29,6 +30,7 @@ private:
 	sf::Vector2f veloc;
 	Diver *target;
 	int hp;
+	Ocean *ocean;
 };
 
 } // fathom
