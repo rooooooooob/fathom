@@ -21,6 +21,8 @@ private:
 
 
 	sf::Sprite sprite;
+	sf::Sprite seaweed;
+	int wiggle;
 };
 
 } // fathom
