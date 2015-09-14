@@ -32,7 +32,6 @@ private:
 	int hp;
 	Ocean *ocean;
 	int hackyCooldown;
-	sf::Vector2f bloodVeloc; // haaaack :D
 };
 
 } // fathom

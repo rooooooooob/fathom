@@ -45,7 +45,7 @@ bool Shark::damage(int amount, const sf::Vector2f& bloodVeloc)
 		{
 			level->addEntity(new Blood(level, getPos(), bloodVeloc + je::lengthdir(je::randomf(0.8f), je::random(180))));
 		}
-		this->bloodVeloc = bloodVeloc;
+		veloc += bloodVeloc;
 		if (hp <= amount)
 		{
 			ocean->addScore(100);
@@ -71,8 +71,11 @@ void Shark::onUpdate()
 		{
 			destroy();
 		}
-		veloc = bloodVeloc;
-		veloc.y += -1.f - je::randomf(0.55f);
+		if (hp < -16)
+		{
+			veloc.y = -1.f - je::randomf(0.55f);
+		}
+		transform().move(veloc);
 		level->addEntity(new Blood(level, getPos(), sf::Vector2f(-0.25f + je::randomf(0.5f), 0.f)));
 		attackAnim.setScale(attackAnim.getScale().x, -1.f);
 	}
@@ -82,9 +85,13 @@ void Shark::onUpdate()
 		{
 			--hackyCooldown;
 		}
-		if (hackyCooldown == 0 && level->testCollision(this, "Explosion"))
+		if (hackyCooldown == 0)
 		{
-			damage(1);
+			je::Entity *expl = level->testCollision(this, "Explosion");
+			if (expl)
+			{
+				damage(4, je::lengthdir(6.f, je::pointDistance(expl->getPos(), getPos())));
+			}
 		}
 
 		if (target)

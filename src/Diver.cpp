@@ -153,9 +153,10 @@ void Diver::draw(sf::RenderTarget& target, const sf::RenderStates &states) const
 
 void Diver::onUpdate()
 {
-	if (level->testCollision(this, "Explosion"))
+	je::Entity *expl = level->testCollision(this, "Explosion");
+	if (expl)
 	{
-		damage(1);
+		damage(5, je::lengthdir(6.f, je::pointDistance(expl->getPos(), getPos())));
 	}
 
 	HealthPickup *pickup = (HealthPickup*)level->testCollision(this, "HealthPickup");
@@ -224,6 +225,7 @@ void Diver::onUpdate()
 		break;
 	case State::Dead:
 		{
+			veloc.x *= 0.98f;
 			veloc.y = -1.f - je::randomf(0.65f);
 			if (--cooldown == 0)
 			{
