@@ -103,12 +103,13 @@ Diver::Diver(je::Level *level, const sf::Vector2f& pos, int playerID)
 
 
 
-bool Diver::damage(int amount)
+bool Diver::damage(int amount, const sf::Vector2f& bloodVeloc)
 {
+	veloc += bloodVeloc;
 	hp = std::max(0, hp - amount);
 	for (int i = 0; i < amount; ++i)
 	{
-		level->addEntity(new Blood(level, getPos(), je::lengthdir(je::randomf(0.8f), je::random(180))));
+		level->addEntity(new Blood(level, getPos(), bloodVeloc + je::lengthdir(je::randomf(0.8f), je::random(180))));
 	}
 
 	if (hp == 0)
@@ -223,7 +224,6 @@ void Diver::onUpdate()
 		break;
 	case State::Dead:
 		{
-			veloc.x = 0.f;
 			veloc.y = -1.f - je::randomf(0.65f);
 			if (--cooldown == 0)
 			{

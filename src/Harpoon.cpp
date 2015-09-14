@@ -30,14 +30,14 @@ void Harpoon::onUpdate()
 	je::Entity* toKill = level->testCollision(this, "Shark");
 	if (toKill)
 	{
-		((Shark*)toKill)->damage(20);
+		((Shark*)toKill)->damage(20, veloc * 0.2f);
 		destroy();
 		return;
 	}
 	toKill = level->testCollision(this, "Diver");
 	if (toKill)
 	{
-		((Diver*)toKill)->damage(20);
+		((Diver*)toKill)->damage(20, veloc * 0.2f);
 		destroy();
 		return;
 	}

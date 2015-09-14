@@ -15,7 +15,7 @@ class Shark : public je::Entity
 public:
 	Shark(Ocean *ocean, const sf::Vector2f& pos);
 
-	bool damage(int amount);
+	bool damage(int amount, const sf::Vector2f& bloodVeloc = sf::Vector2f());
 
 private:
 	void draw(sf::RenderTarget& target, const sf::RenderStates &states) const override;
@@ -32,6 +32,7 @@ private:
 	int hp;
 	Ocean *ocean;
 	int hackyCooldown;
+	sf::Vector2f bloodVeloc; // haaaack :D
 };
 
 } // fathom

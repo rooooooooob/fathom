@@ -16,9 +16,10 @@ public:
 
 	/**
 	 * @param amount amount to hurt
+	 * @param bloodVeloc veloc to knockback particles/diver by
 	 * @return True if the Diver dies, False if he's still alive
 	 */
-	bool damage(int amount);
+	bool damage(int amount, const sf::Vector2f& bloodVeloc = sf::Vector2f());
 
 	const sf::Color& getColor() const;
 
