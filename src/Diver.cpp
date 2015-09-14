@@ -11,6 +11,7 @@
 
 #include "Blood.hpp"
 #include "Harpoon.hpp"
+#include "HealthPickup.hpp"
 
 namespace fathom
 {
@@ -149,6 +150,26 @@ void Diver::onUpdate()
 	if (level->testCollision(this, "Explosion"))
 	{
 		damage(1);
+	}
+
+	HealthPickup *pickup = (HealthPickup*)level->testCollision(this, "HealthPickup");
+	if (pickup)
+	{
+		switch (pickup->getType())
+		{
+		case HealthPickup::Type::Regular:
+			if (hp < maxhp)
+			{
+				hp = std::min(maxhp, hp + 10);
+				pickup->destroy();
+			}
+			break;
+		case HealthPickup::Type::Golden:
+			maxhp += 10;
+			hp = maxhp;
+			pickup->destroy();
+			break;
+		}
 	}
 
 

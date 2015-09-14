@@ -13,6 +13,7 @@
 #include "Treasure.hpp"
 #include "ShipWreck.hpp"
 #include "BottomOfOcean.hpp"
+#include "HealthPickup.hpp"
 
 namespace fathom
 {
@@ -118,7 +119,7 @@ void Ocean::drawGUI(sf::RenderTarget& target) const
 			sf::Vector2f offset = je::lengthdir(1.f, angle);
 			offset.x *= 300;
 			offset.y *= 220;
-			arrow.setPosition(camera->getPosition() + offset);
+			arrow.setPosition(camera->getPosition() + offset - sf::Vector2f(camera->getScreenRect().left, camera->getScreenRect().top));
 			arrow.setRotation(-angle);
 			target.draw(arrow);
 		}
@@ -198,6 +199,16 @@ void Ocean::reset()
 	for (int x = 0; x <= getWidth(); x += 64)
 	{
 		addEntity(new BottomOfOcean(this, sf::Vector2f(x, getHeight() - 64)));
+	}
+
+	for (int i = 0; i < 8 * ratio; ++i)
+	{
+		addEntity(new HealthPickup(this, sf::Vector2f(64 + je::random(getWidth() - 128), safeDepth + je::random(getHeight() - safeDepth - 96)), HealthPickup::Type::Regular));
+	}
+
+	for (int i = 0; i < 3 * ratio; ++i)
+	{
+		addEntity(new HealthPickup(this, sf::Vector2f(64 + je::random(getWidth() - 128), safeDepth + je::random(getHeight() - safeDepth - 96)), HealthPickup::Type::Golden));
 	}
 
 	addEntity(new ShipWreck(this, sf::Vector2f(64 + je::random(getWidth() - 64 - 128), getHeight() - 64 - 128 + 8)));
