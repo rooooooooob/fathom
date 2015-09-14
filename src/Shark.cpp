@@ -81,6 +81,7 @@ void Shark::onUpdate()
 			{
 				if (target->damage(1))
 				{
+
 					patrolRandomDirection();
 				}
 			}
@@ -104,7 +105,12 @@ void Shark::onUpdate()
 	{
 		std::vector<Entity*> closeDivers;
 		const sf::Rect<int> region(getPos().x - 192 + attackAnim.getScale().x * 64, getPos().y - 128, 192*2, 128*2);
-		level->findCollisions(closeDivers, region, "Diver");
+		level->findCollisions(closeDivers, region, "Diver",
+			[](je::Entity*e) -> bool
+			{
+				return ((Diver*)e)->getState() != Diver::State::Dead;
+			}
+		);
 		for (Entity *diver : closeDivers)
 		{
 			if (!target || je::pointDistance(getPos(), diver->getPos()) < je::pointDistance(getPos(), target->getPos()))

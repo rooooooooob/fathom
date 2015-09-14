@@ -125,6 +125,11 @@ const sf::Color& Diver::getColor() const
 	return playerColours[playerID];
 }
 
+Diver::State Diver::getState() const
+{
+	return state;
+}
+
 
 
 // private

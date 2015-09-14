@@ -22,18 +22,20 @@ public:
 
 	const sf::Color& getColor() const;
 
-private:
-	void draw(sf::RenderTarget& target, const sf::RenderStates &states) const override;
-
-	void onUpdate() override;
-
-
 	enum class State
 	{
 		Swimming,
 		Firing,
 		Dead
 	};
+	State getState() const;
+
+private:
+	void draw(sf::RenderTarget& target, const sf::RenderStates &states) const override;
+
+	void onUpdate() override;
+
+
 
 	State state;
 	const int playerID;
