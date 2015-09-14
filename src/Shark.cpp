@@ -19,7 +19,7 @@ Shark::Shark(Ocean *ocean, const sf::Vector2f& pos)
 	:je::Entity(ocean, "Shark", pos, sf::Vector2i(48, 24), sf::Vector2i(-24, -12))
 	,attackAnim(ocean->getGame().getTexManager().get("shark_bite.png"), 48, 24, 4, true)
 	,target(nullptr)
-	,hp(30)
+	,hp(17)
 	,ocean(ocean)
 	,hackyCooldown(128) // to stop sharks from dying immediately to mines
 {
@@ -39,18 +39,21 @@ Shark::Shark(Ocean *ocean, const sf::Vector2f& pos)
 
 bool Shark::damage(int amount)
 {
-	for (int i = 0; i < amount; ++i)
+	if (hp > 0)
 	{
-		level->addEntity(new Blood(level, getPos(), je::lengthdir(je::randomf(0.8f), je::random(180))));
+		for (int i = 0; i < amount; ++i)
+		{
+			level->addEntity(new Blood(level, getPos(), je::lengthdir(je::randomf(0.8f), je::random(180))));
+		}
+		if (hp <= amount)
+		{
+			ocean->addScore(100);
+			attackAnim.setScale(attackAnim.getScale().x, -1.f);
+			hp = 0;
+			return true;
+		}
+		hp -= amount;
 	}
-
-	if (hp <= amount)
-	{
-		destroy();
-		ocean->addScore(100);
-		return true;
-	}
-	hp -= amount;
 	return false;
 }
 
@@ -62,98 +65,111 @@ void Shark::draw(sf::RenderTarget& target, const sf::RenderStates &states) const
 
 void Shark::onUpdate()
 {
-	if (hackyCooldown > 0)
+	if (hp <= 0)
 	{
-		--hackyCooldown;
-	}
-	if (hackyCooldown == 0 && level->testCollision(this, "Explosion"))
-	{
-		damage(1);
-	}
-
-	if (target)
-	{
-		const int dist = je::pointDistance(getPos(), target->getPos());
-		if (dist < 32)
+		if (--hp < -64)
 		{
-			attackAnim.advanceFrame();
-			if (dist < 16)
-			{
-				if (target->damage(1))
-				{
+			destroy();
+		}
+		veloc.x = 0.f;
+		veloc.y = -1.f - je::randomf(0.55f);
+		level->addEntity(new Blood(level, getPos(), sf::Vector2f(-0.25f + je::randomf(0.5f), 0.f)));
+	}
+	else // alive
+	{
+		if (hackyCooldown > 0)
+		{
+			--hackyCooldown;
+		}
+		if (hackyCooldown == 0 && level->testCollision(this, "Explosion"))
+		{
+			damage(1);
+		}
 
-					patrolRandomDirection();
+		if (target)
+		{
+			const int dist = je::pointDistance(getPos(), target->getPos());
+			if (dist < 32)
+			{
+				attackAnim.advanceFrame();
+				if (dist < 16)
+				{
+					if (target->damage(1))
+					{
+
+						patrolRandomDirection();
+					}
 				}
 			}
-		}
-		else if (dist < 1920)
-		{
-			veloc += je::lengthdir(0.5, je::pointDirection(getPos(), target->getPos()));
-		}
-		else
-		{
-			patrolRandomDirection();
-		}
-
-		if (je::length(veloc) > 6.f)
-		{
-			veloc = je::lengthdir(6.f, je::direction(veloc));
-		}
-		veloc *= 0.95f;
-	}
-	else
-	{
-		std::vector<Entity*> closeDivers;
-		const sf::Rect<int> region(getPos().x - 192 + attackAnim.getScale().x * 64, getPos().y - 128, 192*2, 128*2);
-		level->findCollisions(closeDivers, region, "Diver",
-			[](je::Entity*e) -> bool
+			else if (dist < 1920)
 			{
-				return ((Diver*)e)->getState() != Diver::State::Dead;
-			}
-		);
-		for (Entity *diver : closeDivers)
-		{
-			if (!target || je::pointDistance(getPos(), diver->getPos()) < je::pointDistance(getPos(), target->getPos()))
-			{
-				target = static_cast<Diver*>(diver);
-			}
-		}
-
-		if (!target)
-		{
-			if (veloc.x > 0.f)
-			{
-				if (getPos().x > level->getWidth() - 64 || level->testCollision(sf::Rect<int>(getPos().x, getPos().y - 27, 64, 56), "Mine"))
-				{
-					veloc.x = -getPatrolSpeed();
-				}
+				veloc += je::lengthdir(0.5, je::pointDirection(getPos(), target->getPos()));
 			}
 			else
 			{
-				if (getPos().x < 64 || level->testCollision(sf::Rect<int>(getPos().x - 64, getPos().y - 27, 64, 56), "Mine"))
+				patrolRandomDirection();
+			}
+
+			if (je::length(veloc) > 6.f)
+			{
+				veloc = je::lengthdir(6.f, je::direction(veloc));
+			}
+			veloc *= 0.95f;
+		}
+		else
+		{
+			std::vector<Entity*> closeDivers;
+			const sf::Rect<int> region(getPos().x - 192 + attackAnim.getScale().x * 64, getPos().y - 128, 192*2, 128*2);
+			level->findCollisions(closeDivers, region, "Diver",
+				[](je::Entity*e) -> bool
 				{
-					veloc.x = getPatrolSpeed();
+					return ((Diver*)e)->getState() != Diver::State::Dead;
+				}
+			);
+			for (Entity *diver : closeDivers)
+			{
+				if (!target || je::pointDistance(getPos(), diver->getPos()) < je::pointDistance(getPos(), target->getPos()))
+				{
+					target = static_cast<Diver*>(diver);
+				}
+			}
+
+			if (!target)
+			{
+				if (veloc.x > 0.f)
+				{
+					if (getPos().x > level->getWidth() - 64 || level->testCollision(sf::Rect<int>(getPos().x, getPos().y - 27, 64, 56), "Mine"))
+					{
+						veloc.x = -getPatrolSpeed();
+					}
+				}
+				else
+				{
+					if (getPos().x < 64 || level->testCollision(sf::Rect<int>(getPos().x - 64, getPos().y - 27, 64, 56), "Mine"))
+					{
+						veloc.x = getPatrolSpeed();
+					}
 				}
 			}
 		}
-	}
-	attackAnim.setScale(veloc.x < 0.f ? -1.f : 1.f, 1.f);
-	transform().move(veloc);
-	if (getPos().x > level->getWidth() - 24)
-	{
-		transform().setPosition(level->getWidth() - 24, getPos().y);
-	}
-	if (getPos().x < 24)
-	{
-		transform().setPosition(24, getPos().y);
-	}
-	if (getPos().y > level->getHeight() - 64 - 8)
-	{
-		transform().setPosition(getPos().x, level->getHeight() - 64 - 8);
-	}
-	if (getPos().x < 24)
-	{
-		transform().setPosition(getPos().x, 24);
+		attackAnim.setScale(veloc.x < 0.f ? -1.f : 1.f, 1.f);
+		transform().move(veloc);
+		if (getPos().x > level->getWidth() - 24)
+		{
+			transform().setPosition(level->getWidth() - 24, getPos().y);
+		}
+		if (getPos().x < 24)
+		{
+			transform().setPosition(24, getPos().y);
+		}
+		if (getPos().y > level->getHeight() - 64 - 8)
+		{
+			transform().setPosition(getPos().x, level->getHeight() - 64 - 8);
+		}
+		if (getPos().x < 24)
+		{
+			transform().setPosition(getPos().x, 24);
+		}
 	}
 
 	attackAnim.setPosition(getPos());
