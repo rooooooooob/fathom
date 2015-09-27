@@ -2,6 +2,7 @@
 #define FATHOM_SHARK_HPP
 
 #include "jam-engine/Core/Entity.hpp"
+#include "jam-engine/Core/Ref.hpp"
 #include "jam-engine/Graphics/Animation.hpp"
 
 namespace fathom
@@ -28,7 +29,7 @@ private:
 
 	je::Animation attackAnim;
 	sf::Vector2f veloc;
-	Diver *target;
+	je::Ref<Diver> target;
 	int hp;
 	Ocean *ocean;
 	int hackyCooldown;

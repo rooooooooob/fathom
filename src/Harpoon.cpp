@@ -27,24 +27,21 @@ void Harpoon::draw(sf::RenderTarget& target, const sf::RenderStates &states) con
 
 void Harpoon::onUpdate()
 {
-	je::Entity* toKill = level->testCollision(this, "Shark");
-	if (toKill)
+	if (je::Ref<Shark> toKill = level->testCollision(this, "Shark"))
 	{
-		((Shark*)toKill)->damage(20, veloc * 0.2f);
+		toKill->damage(30, veloc * 0.2f);
 		destroy();
 		return;
 	}
-	toKill = level->testCollision(this, "Diver");
-	if (toKill)
+	if (je::Ref<Shark> toKill = level->testCollision(this, "Diver"))
 	{
-		((Diver*)toKill)->damage(20, veloc * 0.2f);
+		toKill->damage(20, veloc * 0.2f);
 		destroy();
 		return;
 	}
-	toKill = level->testCollision(this, "Mine");
-	if (toKill)
+	if (je::Ref<Mine> toKill = level->testCollision(this, "Mine"))
 	{
-		((Mine*)toKill)->explode();
+		toKill->explode();
 		destroy();
 		return;
 	}

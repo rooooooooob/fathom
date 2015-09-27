@@ -31,11 +31,11 @@ void Explosion::draw(sf::RenderTarget& target, const sf::RenderStates &states) c
 
 void Explosion::onUpdate()
 {
-	std::vector<je::Entity*> deathToAll;
+	std::vector<je::Ref<je::Entity>> deathToAll;
 	level->findCollisions(deathToAll, this, "Mine");
-	for (je::Entity *mine : deathToAll)
+	for (je::Ref<Mine> mine : deathToAll)
 	{
-		((Mine*)mine)->explode();
+		mine->explode();
 	}
 	deathToAll.clear();
 

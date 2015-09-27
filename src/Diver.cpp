@@ -156,10 +156,10 @@ void Diver::onUpdate()
 	je::Entity *expl = level->testCollision(this, "Explosion");
 	if (expl)
 	{
-		damage(5, je::lengthdir(6.f, je::pointDistance(expl->getPos(), getPos())));
+		damage(3, je::lengthdir(6.f, je::pointDistance(expl->getPos(), getPos())));
 	}
 
-	HealthPickup *pickup = (HealthPickup*)level->testCollision(this, "HealthPickup");
+	je::Ref<HealthPickup> pickup = level->testCollision(this, "HealthPickup");
 	if (pickup)
 	{
 		switch (pickup->getType())

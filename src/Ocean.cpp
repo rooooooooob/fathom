@@ -87,7 +87,7 @@ void Ocean::onUpdate()
 		reset();
 
 	sf::Vector2f avgPos;
-	for (const je::Entity *diver : entities.at("Diver"))
+	for (const std::unique_ptr<je::Entity>& diver : entities.at("Diver"))
 	{
 		avgPos += diver->getPos();
 	}
@@ -107,9 +107,9 @@ void Ocean::beforeDraw(sf::RenderTarget& target) const
 
 void Ocean::drawGUI(sf::RenderTarget& target) const
 {
-	for (const je::Entity *entity : entities.at("Diver"))
+	for (const std::unique_ptr<je::Entity>& entity : entities.at("Diver"))
 	{
-		const Diver& diver = *((Diver*)entity);
+		const Diver& diver = *((Diver*)entity.get());
 		if (!camera->getScreenRect().contains(diver.getPos()))
 		{
 			sf::Color col(diver.getColor());

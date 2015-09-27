@@ -18,8 +18,8 @@ const float maxPatrolSpeed = 2.f;
 Shark::Shark(Ocean *ocean, const sf::Vector2f& pos)
 	:je::Entity(ocean, "Shark", pos, sf::Vector2i(48, 24), sf::Vector2i(-24, -12))
 	,attackAnim(ocean->getGame().getTexManager().get("shark_bite.png"), 48, 24, 4, true)
-	,target(nullptr)
-	,hp(17)
+	,target()
+	,hp(30)
 	,ocean(ocean)
 	,hackyCooldown(128) // to stop sharks from dying immediately to mines
 {
@@ -28,9 +28,9 @@ Shark::Shark(Ocean *ocean, const sf::Vector2f& pos)
 	veloc.x = je::choose({je::randomf(1.f), -je::randomf(1.f)});
 
 	// delete mines around shark so they don't immediately die... (couldn't fix in Ocean)
-	std::vector<je::Entity*> mines;
+	std::vector<je::Ref<je::Entity>> mines;
 	ocean->findCollisions(mines, sf::Rect<int>(getPos().x - 64, getPos().y - 48, 128, 96), "Mine");
-	for (je::Entity *mine : mines)
+	for (const je::Ref<Entity>& mine : mines)
 	{
 		mine->destroy();
 	}
@@ -87,10 +87,10 @@ void Shark::onUpdate()
 		}
 		if (hackyCooldown == 0)
 		{
-			je::Entity *expl = level->testCollision(this, "Explosion");
+			auto expl = level->testCollision(this, "Explosion");
 			if (expl)
 			{
-				damage(4, je::lengthdir(6.f, je::pointDistance(expl->getPos(), getPos())));
+				damage(1, je::lengthdir(6.f, je::pointDistance(expl->getPos(), getPos())));
 			}
 		}
 
@@ -126,19 +126,19 @@ void Shark::onUpdate()
 		}
 		else
 		{
-			std::vector<Entity*> closeDivers;
+			std::vector<je::Ref<Entity>> closeDivers;
 			const sf::Rect<int> region(getPos().x - 192 + attackAnim.getScale().x * 64, getPos().y - 128, 192*2, 128*2);
 			level->findCollisions(closeDivers, region, "Diver",
-				[](je::Entity*e) -> bool
+				[](je::Entity&e) -> bool
 				{
-					return ((Diver*)e)->getState() != Diver::State::Dead;
+					return ((Diver&)e).getState() != Diver::State::Dead;
 				}
 			);
-			for (Entity *diver : closeDivers)
+			for (je::Ref<Entity>& diver : closeDivers)
 			{
 				if (!target || je::pointDistance(getPos(), diver->getPos()) < je::pointDistance(getPos(), target->getPos()))
 				{
-					target = static_cast<Diver*>(diver);
+					target = diver;
 				}
 			}
 
